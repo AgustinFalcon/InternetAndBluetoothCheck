@@ -18,11 +18,11 @@ class NetworkConnection (private val context: Context): LiveData<Boolean>() {
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
 
 
-    override fun onActive() {
+    override fun onActive() { //5
         super.onActive()
         updateConnection()
         when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
                 connectivityManager.registerDefaultNetworkCallback(connectivityManagerCallback())
             }
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> { //LOLLIPOP
@@ -37,7 +37,7 @@ class NetworkConnection (private val context: Context): LiveData<Boolean>() {
         }
     }
 
-    override fun onInactive() {
+    override fun onInactive() { //6
         super.onInactive()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             connectivityManager.unregisterNetworkCallback(connectivityManagerCallback())
@@ -47,7 +47,7 @@ class NetworkConnection (private val context: Context): LiveData<Boolean>() {
     }
 
     @TargetApi(Build.VERSION_CODES.O)
-    private fun qNetworkRequest() {
+    private fun qNetworkRequest() { //2
         val requestBuilder = NetworkRequest.Builder()
             .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
             .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
@@ -59,7 +59,7 @@ class NetworkConnection (private val context: Context): LiveData<Boolean>() {
         )
     }
 
-    private fun connectivityManagerCallback(): ConnectivityManager.NetworkCallback {
+    private fun connectivityManagerCallback(): ConnectivityManager.NetworkCallback { //1
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             networkCallback = object : ConnectivityManager.NetworkCallback() {
 
@@ -79,13 +79,13 @@ class NetworkConnection (private val context: Context): LiveData<Boolean>() {
         }
     }
 
-    private val networkReceiver = object : BroadcastReceiver() {
+    private val networkReceiver = object : BroadcastReceiver() { //4
         override fun onReceive(context: Context?, intent: Intent?) {
             updateConnection();
         }
     }
 
-    private fun updateConnection() {
+    private fun updateConnection() { //3
         val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
         postValue(activeNetwork?.isConnected == true)
     }
